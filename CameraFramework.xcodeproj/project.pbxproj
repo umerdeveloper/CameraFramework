@@ -7,11 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CB3186E32438447F005E7B28 /* Camera.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB3186E22438447F005E7B28 /* Camera.swift */; };
+		CB35F7D12438B76900719DA3 /* Media.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CB35F7D02438B76900719DA3 /* Media.xcassets */; };
 		CB5013F924370FD200A715F5 /* CameraFramework.h in Headers */ = {isa = PBXBuildFile; fileRef = CB5013F724370FD200A715F5 /* CameraFramework.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		CB5014232437156900A715F5 /* CameraViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5014222437156900A715F5 /* CameraViewController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		CB3186E22438447F005E7B28 /* Camera.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Camera.swift; sourceTree = "<group>"; };
+		CB35F7D02438B76900719DA3 /* Media.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Media.xcassets; sourceTree = "<group>"; };
 		CB5013F424370FD200A715F5 /* CameraFramework.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CameraFramework.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		CB5013F724370FD200A715F5 /* CameraFramework.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = CameraFramework.h; sourceTree = "<group>"; };
 		CB5013F824370FD200A715F5 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -50,6 +54,8 @@
 			children = (
 				CB5013F724370FD200A715F5 /* CameraFramework.h */,
 				CB5014222437156900A715F5 /* CameraViewController.swift */,
+				CB3186E22438447F005E7B28 /* Camera.swift */,
+				CB35F7D02438B76900719DA3 /* Media.xcassets */,
 				CB5013F824370FD200A715F5 /* Info.plist */,
 			);
 			path = CameraFramework;
@@ -125,6 +131,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB35F7D12438B76900719DA3 /* Media.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -135,6 +142,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB3186E32438447F005E7B28 /* Camera.swift in Sources */,
 				CB5014232437156900A715F5 /* CameraViewController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

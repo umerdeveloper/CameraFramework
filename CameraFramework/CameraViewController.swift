@@ -9,73 +9,134 @@
 import UIKit
 import AVFoundation
 
+public protocol CameraControllerDelegate {
+    func cancelButtonTapped(controller: CameraViewController)
+    func stillImageCaptured(controller: CameraViewController, image: UIImage)
+}
+
+public enum CameraPosition {
+    case front
+    case back
+}
+
 public final class CameraViewController: UIViewController {
-    var captureSession = AVCaptureSession()
-    var discoverySession: AVCaptureDevice.DiscoverySession? {
-        return AVCaptureDevice.DiscoverySession(deviceTypes: [AVCaptureDevice.DeviceType.builtInWideAngleCamera], mediaType: AVMediaType.video, position: AVCaptureDevice.Position.unspecified)
+    
+    fileprivate var camera: Camera?
+    
+    var previewLayer: AVCaptureVideoPreviewLayer?
+    public var delegate: CameraControllerDelegate?
+    private var _shutterButton: UIButton?
+    
+    var shutterButton: UIButton {
+        if let currentButton = _shutterButton {
+            return currentButton
+        }
+        let button = UIButton()
+        button.setImage(UIImage(named: "trigger", in: Bundle(for: CameraViewController.self), compatibleWith: nil), for: .normal)
+        button.addTarget(self, action: #selector(shutterButtonTapped), for: .touchUpInside)
+        _shutterButton = button
+        return button
     }
-    var videoCapture = AVCaptureVideoDataOutput()
+    
+    // create a button
+    private var _cancelButton: UIButton?
+    
+    var cancelButton: UIButton {
+        if let currentButton = _cancelButton {
+            return currentButton
+        }
+        let button = UIButton(frame: CGRect(x: view.frame.minX + 10, y: view.frame.maxY - 50, width: 70, height: 30))
+        button.setTitle("Cancel", for: .normal)
+        button.addTarget(self, action: #selector(cancelButtonTapped), for: .touchUpInside)
+        _cancelButton = button
+        return button
+    }
+    
+    public var position: CameraPosition = .back {
+        didSet {
+            guard let camera = camera else { return }
+            camera.position = position
+        }
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        guard let camera = camera else { return }
+        createUI()
+        camera.update()
+    }
+    
+    public override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
+        updateButtonFrames()
+        updateUI(orientation: (UIApplication.shared.windows.first?.windowScene!.interfaceOrientation)!)
+        
+    }
     
     public init() {
         super.init(nibName: nil, bundle: nil)
-        createUI()
-        commitConfiguration()
+        let camera = Camera(with: self)
+        camera.delegate = self
+        self.camera = camera
     }
     
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
-    
-    public override func viewDidLoad() {
-        super.viewDidLoad()
-    }
-    
-    func getPreviewLayer(session: AVCaptureSession) -> AVCaptureVideoPreviewLayer {
-        let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.frame = view.bounds
-        return previewLayer
-    }
-    
-    func getDevice() -> AVCaptureDevice? {
-        guard let discoverySession = discoverySession else { return nil }
-        for device in discoverySession.devices {
-            if device.position == AVCaptureDevice.Position.back {
-                return device
-            }
-        }
-        return nil
-    }
-    
+}
+
+
+fileprivate extension CameraViewController {
     func createUI() {
-        view.layer.addSublayer(getPreviewLayer(session: captureSession))
+        guard let camera = camera else { return }
+        guard let previewLayer = camera.getPreviewLayer() else { return }
+        self.previewLayer = previewLayer
+        view.layer.addSublayer(previewLayer)
+        view.addSubview(cancelButton)
+        view.addSubview(shutterButton)
     }
     
-    func commitConfiguration() {
-        do {
-            guard let device = getDevice() else { return }
-            let input = try AVCaptureDeviceInput(device: device)
-            if captureSession.canAddInput(input) && captureSession.canAddOutput(videoCapture) {
-                captureSession.addInput(input)
-                captureSession.addOutput(videoCapture)
-                captureSession.commitConfiguration()
-                captureSession.startRunning()
-            }
-            
-            
-        } catch {
-            print("Error linking device to AVInputs!")
-            return
+    func updateUI(orientation: UIInterfaceOrientation) {
+        guard let previewLayer = previewLayer, let connection = previewLayer.connection else { return }
+        previewLayer.frame = view.bounds
+        switch orientation {
+            case .portrait:
+                connection.videoOrientation = .portrait
+            case .landscapeLeft:
+                connection.videoOrientation = .landscapeLeft
+            case .landscapeRight:
+                connection.videoOrientation = .landscapeRight
+            case .portraitUpsideDown:
+                connection.videoOrientation = .portraitUpsideDown
+            default:
+                connection.videoOrientation = .portrait
         }
     }
     
+    func updateButtonFrames() {
+        cancelButton.frame = CGRect(x: view.frame.minX + 10, y: view.frame.maxY - 50, width: 70, height: 30)
+        shutterButton.frame = CGRect(x: self.view.frame.midX - 35, y: self.view.frame.maxY - 80 , width: 70, height: 70)
+    }
+}
+// MARK: - UI Button Functions
+fileprivate extension CameraViewController {
     
-    
-    
-    
-    
-    
-    
-    
-    
-    
+    @objc func cancelButtonTapped() {
+        if let delegate = delegate {
+            delegate.cancelButtonTapped(controller: self)
+        }
+    }
+    @objc func shutterButtonTapped() {
+        if let camera = self.camera {
+            camera.captureStillImage()
+        }
+    }
+}
+// MARK: - Camera Delegate
+extension CameraViewController: CameraDelegate {
+    func stillImageCaptured(camera: Camera, image: UIImage) {
+        if let delegate = self.delegate {
+            delegate.stillImageCaptured(controller: self, image: image)
+        }
+    }
 }
