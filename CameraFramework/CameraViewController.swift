@@ -73,9 +73,16 @@ public final class CameraViewController: UIViewController {
         
     }
     
+    public class func getVersion() -> String? {
+        let bundle = Bundle(for: CameraViewController.self)
+        guard let info = bundle.infoDictionary else { return nil }
+        guard let versionString = info["CFBundleShortVersionString"] as? String else { return nil }
+        return versionString
+    }
+    
     public init() {
         super.init(nibName: nil, bundle: nil)
-        let camera = Camera(with: self)
+        let camera = Camera()
         camera.delegate = self
         self.camera = camera
     }
@@ -98,6 +105,7 @@ fileprivate extension CameraViewController {
     
     func updateUI(orientation: UIInterfaceOrientation) {
         guard let previewLayer = previewLayer, let connection = previewLayer.connection else { return }
+        previewLayer.frame = self.view.bounds
         previewLayer.frame = view.bounds
         switch orientation {
             case .portrait:

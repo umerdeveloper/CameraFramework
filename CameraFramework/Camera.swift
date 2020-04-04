@@ -17,7 +17,7 @@ class Camera: NSObject {
     
     var delegate: CameraDelegate?
     
-    var controller: CameraViewController?
+    // var controller: CameraViewController?
     var position: CameraPosition = .back {
         didSet {
             if session.isRunning {
@@ -27,8 +27,8 @@ class Camera: NSObject {
         }
     }
     
-    required init(with controller: CameraViewController) {
-        self.controller = controller
+    required override init() {
+       // self.controller = controller
     }
     fileprivate var session = AVCaptureSession()
     fileprivate var discoverySession: AVCaptureDevice.DiscoverySession? {
@@ -39,9 +39,8 @@ class Camera: NSObject {
     var photoOutput = AVCapturePhotoOutput()
     
     func getPreviewLayer() -> AVCaptureVideoPreviewLayer? {
-        guard let controller = controller else { return nil }
+        
         let previewLayer = AVCaptureVideoPreviewLayer(session: session)
-        previewLayer.bounds = controller.view.bounds
         previewLayer.videoGravity = AVLayerVideoGravity.resizeAspectFill
         return previewLayer
     }
